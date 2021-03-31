@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/y-akahori-ramen/ue4Runner/logServer"
 )
 
 type options struct {
@@ -40,15 +41,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server, err := newLogServer(opt.Dir)
+	server, err := logServer.NewLogServer(opt.Dir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	dirPathAbs, err := filepath.Abs(opt.Dir)
-	log.Printf("サーバー起動します\n対象ディレクトリ:%v", dirPathAbs)
+	log.Printf("サーバー起動します\n対象ディレクトリ:%v\nAddr:%v/files/", dirPathAbs, opt.Addr)
 
-	handler := basicAuthHandler{nextHandler: server.newHTTPHandler(), user: opt.User, password: opt.Password}
+	handler := basicAuthHandler{nextHandler: server.NewHTTPHandler(), user: opt.User, password: opt.Password}
 
 	err = http.ListenAndServe(opt.Addr, &handler)
 	if err != nil {
